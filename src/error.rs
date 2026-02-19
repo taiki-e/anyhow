@@ -411,7 +411,7 @@ impl Error {
     /// anyhow = { version = "1.0", features = ["backtrace"] }
     /// ```
     #[cfg(feature = "std")]
-    pub fn backtrace(&self) -> &std::backtrace::Backtrace {
+    pub fn backtrace(&self) -> &Backtrace {
         unsafe { ErrorImpl::backtrace(self.inner.by_ref()) }
     }
 

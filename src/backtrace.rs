@@ -1,5 +1,5 @@
 #[cfg(feature = "std")]
-pub(crate) use std::backtrace::{Backtrace, BacktraceStatus};
+pub(crate) use std::backtrace::Backtrace;
 
 #[cfg(not(feature = "std"))]
 pub(crate) enum Backtrace {}
@@ -7,7 +7,7 @@ pub(crate) enum Backtrace {}
 #[cfg(feature = "std")]
 macro_rules! backtrace {
     () => {
-        Some(crate::backtrace::Backtrace::capture())
+        Some(std::backtrace::Backtrace::capture())
     };
 }
 

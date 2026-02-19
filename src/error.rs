@@ -155,7 +155,7 @@ impl Error {
             object_reallocate_boxed: object_reallocate_boxed::<E>,
             object_downcast: object_downcast::<E>,
             object_drop_rest: object_drop_front::<E>,
-            #[cfg(all(not(error_generic_member_access), std_backtrace))]
+            #[cfg(all(not(error_generic_member_access), feature = "std"))]
             object_backtrace: no_backtrace,
         };
 
@@ -179,7 +179,7 @@ impl Error {
             object_reallocate_boxed: object_reallocate_boxed::<MessageError<M>>,
             object_downcast: object_downcast::<M>,
             object_drop_rest: object_drop_front::<M>,
-            #[cfg(all(not(error_generic_member_access), std_backtrace))]
+            #[cfg(all(not(error_generic_member_access), feature = "std"))]
             object_backtrace: no_backtrace,
         };
 
@@ -204,7 +204,7 @@ impl Error {
             object_reallocate_boxed: object_reallocate_boxed::<DisplayError<M>>,
             object_downcast: object_downcast::<M>,
             object_drop_rest: object_drop_front::<M>,
-            #[cfg(all(not(error_generic_member_access), std_backtrace))]
+            #[cfg(all(not(error_generic_member_access), feature = "std"))]
             object_backtrace: no_backtrace,
         };
 
@@ -235,7 +235,7 @@ impl Error {
             object_reallocate_boxed: object_reallocate_boxed::<ContextError<C, E>>,
             object_downcast: context_downcast::<C, E>,
             object_drop_rest: context_drop_rest::<C, E>,
-            #[cfg(all(not(error_generic_member_access), std_backtrace))]
+            #[cfg(all(not(error_generic_member_access), feature = "std"))]
             object_backtrace: no_backtrace,
         };
 
@@ -260,7 +260,7 @@ impl Error {
             object_reallocate_boxed: object_reallocate_boxed::<BoxedError>,
             object_downcast: object_downcast::<Box<dyn StdError + Send + Sync>>,
             object_drop_rest: object_drop_front::<Box<dyn StdError + Send + Sync>>,
-            #[cfg(all(not(error_generic_member_access), std_backtrace))]
+            #[cfg(all(not(error_generic_member_access), feature = "std"))]
             object_backtrace: no_backtrace,
         };
 
@@ -372,7 +372,7 @@ impl Error {
             object_reallocate_boxed: object_reallocate_boxed::<ContextError<C, Error>>,
             object_downcast: context_chain_downcast::<C>,
             object_drop_rest: context_chain_drop_rest::<C>,
-            #[cfg(all(not(error_generic_member_access), std_backtrace))]
+            #[cfg(all(not(error_generic_member_access), feature = "std"))]
             object_backtrace: context_backtrace::<C>,
         };
 
@@ -410,7 +410,7 @@ impl Error {
     /// [dependencies]
     /// anyhow = { version = "1.0", features = ["backtrace"] }
     /// ```
-    #[cfg(std_backtrace)]
+    #[cfg(feature = "std")]
     pub fn backtrace(&self) -> &std::backtrace::Backtrace {
         unsafe { ErrorImpl::backtrace(self.inner.by_ref()) }
     }
@@ -728,7 +728,7 @@ struct ErrorVTable {
     object_reallocate_boxed: unsafe fn(Own<ErrorImpl>) -> Box<dyn StdError + Send + Sync + 'static>,
     object_downcast: unsafe fn(Ref<ErrorImpl>, TypeId) -> Option<Ref<()>>,
     object_drop_rest: unsafe fn(Own<ErrorImpl>, TypeId),
-    #[cfg(all(not(error_generic_member_access), std_backtrace))]
+    #[cfg(all(not(error_generic_member_access), feature = "std"))]
     object_backtrace: unsafe fn(Ref<ErrorImpl>) -> Option<&Backtrace>,
 }
 
@@ -804,7 +804,7 @@ where
     }
 }
 
-#[cfg(all(not(error_generic_member_access), std_backtrace))]
+#[cfg(all(not(error_generic_member_access), feature = "std"))]
 fn no_backtrace(e: Ref<ErrorImpl>) -> Option<&Backtrace> {
     let _ = e;
     None
@@ -888,7 +888,7 @@ where
 }
 
 // Safety: requires layout of *e to match ErrorImpl<ContextError<C, Error>>.
-#[cfg(all(not(error_generic_member_access), std_backtrace))]
+#[cfg(all(not(error_generic_member_access), feature = "std"))]
 #[allow(clippy::unnecessary_wraps)]
 unsafe fn context_backtrace<C>(e: Ref<ErrorImpl>) -> Option<&Backtrace>
 where
@@ -954,7 +954,7 @@ impl ErrorImpl {
         }
     }
 
-    #[cfg(std_backtrace)]
+    #[cfg(feature = "std")]
     pub(crate) unsafe fn backtrace(this: Ref<Self>) -> &Backtrace {
         // This unwrap can only panic if the underlying error's backtrace method
         // is nondeterministic, which would only happen in maliciously

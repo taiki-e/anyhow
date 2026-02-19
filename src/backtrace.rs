@@ -1,17 +1,17 @@
-#[cfg(std_backtrace)]
+#[cfg(feature = "std")]
 pub(crate) use std::backtrace::{Backtrace, BacktraceStatus};
 
-#[cfg(not(std_backtrace))]
+#[cfg(not(feature = "std"))]
 pub(crate) enum Backtrace {}
 
-#[cfg(std_backtrace)]
+#[cfg(feature = "std")]
 macro_rules! backtrace {
     () => {
         Some(crate::backtrace::Backtrace::capture())
     };
 }
 
-#[cfg(not(std_backtrace))]
+#[cfg(not(feature = "std"))]
 macro_rules! backtrace {
     () => {
         None
@@ -28,18 +28,14 @@ macro_rules! backtrace_if_absent {
     };
 }
 
-#[cfg(all(
-    any(feature = "std", not(anyhow_no_core_error)),
-    not(error_generic_member_access),
-    std_backtrace
-))]
+#[cfg(all(not(error_generic_member_access), feature = "std"))]
 macro_rules! backtrace_if_absent {
     ($err:expr) => {
         backtrace!()
     };
 }
 
-#[cfg(all(any(feature = "std", not(anyhow_no_core_error)), not(std_backtrace)))]
+#[cfg(all(not(anyhow_no_core_error), not(feature = "std")))]
 macro_rules! backtrace_if_absent {
     ($err:expr) => {
         None

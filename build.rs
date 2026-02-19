@@ -9,11 +9,6 @@ use std::path::Path;
 use std::process::{self, Command, Stdio};
 use std::str;
 
-#[cfg(all(feature = "backtrace", not(feature = "std")))]
-compile_error! {
-    "`backtrace` feature without `std` feature is not supported"
-}
-
 fn main() {
     let mut error_generic_member_access = false;
     if cfg!(feature = "std") {

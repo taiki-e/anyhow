@@ -14,6 +14,9 @@ rust-version = "1.68"
 [features]
 default = ["std"]
 std = []
+# Compatibility with the old backtrace optional dependency; allow
+# specifying backtrace as a feature without breaking
+backtrace = []
 
 [dev-dependencies]
 futures = { version = "0.3", default-features = false }
